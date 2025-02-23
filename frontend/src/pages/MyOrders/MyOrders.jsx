@@ -58,23 +58,26 @@ import { StoreContext } from '../../Context/StoreContext';
 import { assets } from '../../assets/assets';
 
 const MyOrders = () => {
-  
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true); // ✅ Loading state
-  const [error, setError] = useState(null); // ✅ Error state
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const { url, token, currency } = useContext(StoreContext);
 
   const fetchOrders = async () => {
-    if (!token) return; // ✅ Prevent request if no token
+    if (!token) return; // Prevent request if no token
 
     setLoading(true);
     setError(null);
 
     try {
-      const response = await axios.post(`${url}/api/order/userorders`, {}, {
-        headers: { Authorization: `Bearer ${token}` }, // ✅ Use proper token format
-      });
+      const response = await axios.post(
+        `${url}/api/order/userorders`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` }, // Ensure correct token format
+        }
+      );
 
       if (response.data.success) {
         setData(response.data.data);
@@ -89,15 +92,17 @@ const MyOrders = () => {
   };
 
   useEffect(() => {
-    fetchOrders();
+    if (token) {
+      fetchOrders();
+    }
   }, [token]);
 
   return (
     <div className='my-orders'>
       <h2>My Orders</h2>
 
-      {loading && <p>Loading orders...</p>} {/* ✅ Show loading state */}
-      {error && <p className="error">{error}</p>} {/* ✅ Show error message */}
+      {loading && <p>Loading orders...</p>}
+      {error && <p className="error">{error}</p>}
 
       <div className="container">
         {data.length > 0 ? (
@@ -112,11 +117,11 @@ const MyOrders = () => {
               <p>{currency}{order.amount}.00</p>
               <p>Items: {order.items.length}</p>
               <p><span>&#x25cf;</span> <b>{order.status}</b></p>
-              <button onClick={fetchOrders}>Track Order</button>
+              <button onClick={() => fetchOrders()}>Track Order</button>
             </div>
           ))
         ) : (
-          !loading && <p>No orders found.</p> // ✅ Show "No orders" if empty
+          !loading && <p>No orders found.</p>
         )}
       </div>
     </div>
@@ -124,4 +129,3 @@ const MyOrders = () => {
 };
 
 export default MyOrders;
-
